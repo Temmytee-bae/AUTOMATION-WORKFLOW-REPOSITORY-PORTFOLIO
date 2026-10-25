@@ -1,0 +1,148 @@
+{
+  "name": "EXCHANGE RATE WORKFLOW",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "24fdb8cf-93b6-4922-9a3e-a3334efba79f",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://open.er-api.com/v6/latest/USD",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "1beb9690-6ede-4b92-b7bd-ad382f06a7c9",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "73430b28-107d-48fd-8eda-e27c37e1a865",
+              "name": "currency",
+              "value": "USD/NGN",
+              "type": "string"
+            },
+            {
+              "id": "8b6a1af9-846c-4055-aef8-b7eeb3ad33ea",
+              "name": "rate",
+              "value": "={{$json.rates.NGN}}",
+              "type": "number"
+            },
+            {
+              "id": "9bc5e5bf-a5cb-41d7-b0e7-db4ebd31cc40",
+              "name": "updatedAt",
+              "value": "={{$json.time_last_update_utc}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "50071e33-88d4-461b-bd8d-14e44ca102af",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "chatId": "6370512861",
+        "text": "=Daily Dollar Rate Alert  1 USD = ₦{{ $json.rate }}  Last updated: {{ $json.date }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "95f626c3-416d-4a7c-b257-b8cfe09c40ba",
+      "name": "Send a text message",
+      "webhookId": "1c630900-1618-4ab1-a0b8-7d3f422ea1f5",
+      "credentials": {
+        "telegramApi": {
+          "id": "XmIOluux8Of14hBs",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b674b785-fff3-478d-88d9-6d9ce6afbf8b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ea0d3d112bda4b9d0420adcc10d0ae0aa528cb3aeceb1d8ce7ba5d6e689c3a62"
+  },
+  "nodeGroups": [],
+  "id": "4RerxgO1TzXEh3lo",
+  "tags": []
+}
